@@ -423,3 +423,89 @@ glowEyes:Register("models/hunter.mdl", {
         return Color(0, 255, 255), Color(0, 255, 255)
     end
 })
+
+glowEyes:Register("models/player/combine_super_soldier.mdl", {
+    serverInit = function(self, ent)
+        if not ( IsValid(ent) ) then
+            return
+        end
+        
+        if ( IsValid(ent.worldGlowSprite) ) then
+            ent.worldGlowSprite:Remove()
+        end
+        
+        if ( IsValid(ent.leftEyeGlow) ) then
+            ent.leftEyeGlow:Remove()
+        end
+        
+        if ( IsValid(ent.rightEyeGlow) ) then
+            ent.rightEyeGlow:Remove()
+        end
+        
+        local attachment = ent:GetAttachment(ent:LookupAttachment("eyes"))
+        
+        if not ( attachment ) then
+            return
+        end
+        
+        local pos = attachment.Pos
+        pos = pos + attachment.Ang:Forward() * -0.2
+        pos = pos + attachment.Ang:Up() * 1
+        
+        local eyePos = attachment.Pos
+        eyePos = eyePos + attachment.Ang:Forward() * -0.2
+        eyePos = eyePos + attachment.Ang:Up() * 0.4
+        
+        local eColor, gColor = Color(255, 0, 0), Color(255, 0, 0)
+
+        if ( self.color and isfunction(self.color) ) then
+            eColor, gColor = self:color(ent)
+        end
+
+        ent.leftEyeGlow = ents.Create("env_sprite")
+        ent.leftEyeGlow:SetPos(eyePos)
+        ent.leftEyeGlow:SetParent(ent, ent:LookupAttachment("eyes"))
+        ent.leftEyeGlow:SetKeyValue("rendermode", "9")
+        ent.leftEyeGlow:SetKeyValue("renderamt", "255")
+        ent.leftEyeGlow:SetKeyValue("rendercolor", eColor.r .. " " .. eColor.g .. " " .. eColor.b)
+        ent.leftEyeGlow:SetKeyValue("renderfx", "0")
+        ent.leftEyeGlow:SetKeyValue("HDRColorScale", "0.5")
+        ent.leftEyeGlow:SetKeyValue("model", "sprites/light_glow02_add_noz.vmt")
+        ent.leftEyeGlow:SetKeyValue("scale", "0.05")
+        ent.leftEyeGlow:Spawn()
+        
+        ent.worldGlowSprite = ents.Create("env_sprite")
+        ent.worldGlowSprite:SetPos(pos)
+        ent.worldGlowSprite:SetParent(ent, ent:LookupAttachment("eyes"))
+        ent.worldGlowSprite:SetKeyValue("rendermode", "9")
+        ent.worldGlowSprite:SetKeyValue("renderamt", "110")
+        ent.worldGlowSprite:SetKeyValue("rendercolor", gColor.r .. " " .. gColor.g .. " " .. gColor.b)
+        ent.worldGlowSprite:SetKeyValue("renderfx", "0")
+        ent.worldGlowSprite:SetKeyValue("HDRColorScale", "1")
+        ent.worldGlowSprite:SetKeyValue("model", "sun/overlay.vmt")
+        ent.worldGlowSprite:SetKeyValue("scale", "0.2")
+        ent.worldGlowSprite:Spawn()
+        
+        timer.Simple(0.1, function()
+            local glowTable = {}
+
+            if ( IsValid(ent.leftEyeGlow) ) then
+                glowTable[#glowTable + 1] = ent.leftEyeGlow
+            end
+
+            if ( IsValid(ent.worldGlowSprite) ) then
+                glowTable[#glowTable + 1] = ent.worldGlowSprite
+            end
+    
+            net.Start("glowEyes.NetworkLightsToClientside")
+                net.WriteEntity(ent)
+                net.WriteTable(glowTable)
+            net.Broadcast()
+
+            ent.glowEyesTable = glowTable
+        end)
+    end,
+    color = function(self, ent)
+        return ent:GetPlayerColor():ToColor(), ent:GetPlayerColor():ToColor()
+    end
+})

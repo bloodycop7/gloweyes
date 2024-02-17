@@ -200,6 +200,8 @@ if ( CLIENT ) then
             return
         end
 
+        print("E")
+
         ent.glowEyesTable = eyesTable
 
         if ( ent == LocalPlayer() ) then
@@ -305,7 +307,7 @@ else
                 return
             end
 
-            if not ( glowEyes:ShouldRenderEntity(ent) ) then
+            if not ( glowEyes:ShouldRenderEntity(ply) ) then
                 return
             end
 
@@ -317,7 +319,7 @@ else
                 local uID = "glowEyes.serverThink." .. ply:SteamID64()
 
                 timer.Create(uID, 1, 0.10, function()
-                    if not ( IsValid(ent) ) then
+                    if not ( IsValid(ply) ) then
                         timer.Remove(uID)
 
                         return
@@ -327,7 +329,7 @@ else
                         return
                     end
 
-                    glowData:serverThink(ent)
+                    glowData:serverThink(ply)
                 end)
             end
         end)
