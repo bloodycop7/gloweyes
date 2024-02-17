@@ -33,15 +33,11 @@ function glowEyes:ShouldRenderEntity(ent)
         return false
     end
     
-    if not ( ent:IsPlayer() and ent:Alive() ) and not ( ent:IsNPC() and ent:Health() > 0 ) then
-        return false
+    if not ( ent:IsNPC() or ent:IsRagdoll() ) then
+        return
     end
 
     if ( ent:GetNoDraw() ) then
-        return false
-    end
-
-    if ( ( ent:IsPlayer() and not ent:Alive() ) or ( ent:IsNPC() and ent:Health() <= 0 ) ) then
         return false
     end
 
@@ -221,6 +217,28 @@ else
             if ( ent:IsRagdoll() ) then
                 ent:SetShouldServerRagdoll(true)
                 ent:SetCollisionGroup(COLLISION_GROUP_WORLD)
+            end
+
+            if ( glowData.serverThink and isfunction(glowData.serverThink) ) then
+                local uID = "glowEyes.serverThink." .. ent:GetClass() .. "." .. ent:EntIndex()
+
+                timer.Create(uID, 1, 0.10, function()
+                    if not ( IsValid(ent) ) then
+                        timer.Remove(uID)
+
+                        return
+                    end
+
+                    if not ( ent.glowEyesTable ) then
+                        return
+                    end
+
+                    glowData:serverThink(ent)
+                end)
+
+                ent:CallOnRemove("glowEyes.serverThink.remove", function(this)
+                    timer.Remove(uID)
+                end)
             end
 
             if ( glowData.serverInit and isfunction(glowData.serverInit) ) then
