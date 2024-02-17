@@ -33,7 +33,7 @@ function glowEyes:ShouldRenderEntity(ent)
         return false
     end
     
-    if not ( ent:IsNPC() or ent:IsRagdoll() ) then
+    if not ( ent:IsPlayer() or ent:IsNPC() or ent:IsRagdoll() ) then
         return
     end
 
@@ -86,6 +86,10 @@ if ( CLIENT ) then
             end
 
             if not ( v:GetModel() ) then
+                continue
+            end
+
+            if not ( glowEyes:ShouldRenderEntity(v) ) then
                 continue
             end
 
@@ -147,6 +151,10 @@ if ( CLIENT ) then
                 continue
             end
 
+            if not ( glowEyes:ShouldRenderEntity(v) ) then
+                continue
+            end
+
             if not ( v:IsRagdoll() ) then
                 continue
             end
@@ -175,7 +183,11 @@ if ( CLIENT ) then
         end
     end, "glowEyes.ragdollsChanged")
 
-    net.Receive("glowEyes.NetworkLightsToClientside", function(len, ply)
+    net.Receive("glowEyes.NetworkLightsToClientside", function(len)
+        if not ( IsValid(LocalPlayer()) ) then
+            return
+        end
+
         local ent = net.ReadEntity()
 
         if not ( IsValid(ent) ) then
@@ -189,6 +201,16 @@ if ( CLIENT ) then
         end
 
         ent.glowEyesTable = eyesTable
+
+        if ( ent == LocalPlayer() ) then
+            for k, v in ipairs(eyesTable) do
+                if not ( IsValid(v) ) then
+                    continue
+                end
+
+                v:SetNoDraw(true)
+            end
+        end
     end)
 else
     util.AddNetworkString("glowEyes.NetworkLightsToClientside")
@@ -269,6 +291,60 @@ else
                 end)
             end
         end)
+    end)
+
+    hook.Add("PlayerSpawn", "glowEyes.PlayerSpawn", function(ply)
+        timer.Simple(0.1, function()
+            if not ( IsValid(ply) ) then
+                return
+            end
+
+            local glowData = glowEyes.Stored[ply:GetModel():lower()]
+
+            if not ( glowData ) then
+                return
+            end
+
+            if not ( glowEyes:ShouldRenderEntity(ent) ) then
+                return
+            end
+
+            if ( glowData.serverInit and isfunction(glowData.serverInit) ) then
+                glowData:serverInit(ply)
+            end
+
+            if ( glowData.serverThink and isfunction(glowData.serverThink) ) then
+                local uID = "glowEyes.serverThink." .. ply:SteamID64()
+
+                timer.Create(uID, 1, 0.10, function()
+                    if not ( IsValid(ent) ) then
+                        timer.Remove(uID)
+
+                        return
+                    end
+
+                    if not ( ent.glowEyesTable ) then
+                        return
+                    end
+
+                    glowData:serverThink(ent)
+                end)
+            end
+        end)
+    end)
+    
+    hook.Add("PlayerDisconnected", "glowEyes.PlayerDisconnected", function(ply)
+        if ( ply.glowEyesTable ) then
+            for k, v in ipairs(ply.glowEyesTable) do
+                if not ( IsValid(v) ) then
+                    continue
+                end
+
+                v:Remove()
+            end
+        end
+
+        timer.Remove("glowEyes.serverThink." .. ply:SteamID64())
     end)
 
     hook.Add("OnNPCKilled", "glowEyes.OnNPCKilled", function(ent, attacker, inflictor)
