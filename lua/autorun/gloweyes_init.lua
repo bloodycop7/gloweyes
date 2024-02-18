@@ -83,28 +83,18 @@ if ( CLIENT ) then
             return
         end
 
-        for k, v in ipairs(ents.GetAll()) do
+        local eyeGlowData = LocalPlayer().glowEyesTable
+
+        if not ( eyeGlowData ) then
+            return
+        end
+
+        for k, v in ipairs(eyeGlowData) do
             if not ( IsValid(v) ) then
                 continue
             end
 
-            if ( v == LocalPlayer() ) then
-                continue
-            end
-
-            local eyeGlowData = v.glowEyesTable
-
-            if not ( eyeGlowData ) then
-                continue
-            end
-
-            for a, b in ipairs(eyeGlowData) do
-                if not ( IsValid(b) ) then
-                    continue
-                end
-
-                b:SetNoDraw(true)
-            end
+            v:SetNoDraw(true)
         end
     end)
 
@@ -172,7 +162,7 @@ if ( CLIENT ) then
             return
         end
 
-        if not ( GetConVar("gloweyes_enabled"):GetBool() ) then
+        if not ( glowEyes:IsActivated() ) then
             print("[GlowEyes] Glow Eyes is not enabled, so this change will not take effect.")
 
             return
@@ -312,6 +302,36 @@ else
 
                 glowData:serverInit(ent)
 
+                if ( glowData.serverThink and isfunction(glowData.serverThink) ) then
+                    local uID = "glowEyes.serverThink." .. ent:EntIndex()
+    
+                    timer.Create(uID, 1, 0.1, function()
+                        if not ( IsValid(ent) ) then
+                            timer.Remove(uID)
+    
+                            return
+                        end
+    
+                        if not ( ent.glowEyesTable ) then
+                            return
+                        end
+    
+                        for k, v in ipairs(ent.glowEyesTable) do
+                            if not ( IsValid(v) ) then
+                                continue
+                            end
+    
+                            if ( glowEyes:ShouldRenderEntity(ent) ) then
+                                continue
+                            end
+    
+                            v:SetNoDraw(true)                        
+                        end
+    
+                        glowData:serverThink(ent)
+                    end)
+                end
+                
                 timer.Simple(0.1, function()
                     if ( ent.glowEyesTable ) then
                         for k, v in ipairs(ent.glowEyesTable) do
@@ -323,7 +343,7 @@ else
                                 v:SetNoDraw(true)
                             end
 
-                            if not ( GetConVar("gloweyes_enabled"):GetBool() ) then
+                            if not ( glowEyes:IsActivated() ) then
                                 v:SetNoDraw(true)
                             end
 
@@ -430,5 +450,25 @@ else
         end
 
         ent:SetShouldServerRagdoll(true)
+    end)
+
+    hook.Add("EntityRemoved", "glowEyes.EntityRemoved", function(ent)
+        if not ( IsValid(ent) ) then
+            return
+        end
+
+        if ( timer.Exists("glowEyes.serverThink." .. ent:EntIndex()) ) then
+            timer.Remove("glowEyes.serverThink." .. ent:EntIndex())
+        end
+
+        if ( ent.glowEyesTable ) then
+            for k, v in ipairs(ent.glowEyesTable) do
+                if not ( IsValid(v) ) then
+                    continue
+                end
+
+                v:Remove()
+            end
+        end
     end)
 end
