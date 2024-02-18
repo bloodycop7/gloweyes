@@ -103,10 +103,19 @@ glowEyes:Register("models/combine_soldier.mdl", {
     end,
     color = function(self, ent)
         if ( ent:GetSkin() == 1 ) then
-            return Color(200, 70, 70), Color(200, 70, 70), Color(255, 100, 0)
+            return Color(255, 80, 0), Color(255, 80, 70), Color(255, 80, 0)
         end
 
         return Color(0, 255, 255), Color(0, 255, 255), Color(0, 255, 255)
+    end,
+    serverThink = function(self, ent)
+        for k, v in ipairs(ent.glowEyesTable) do
+            if not ( IsValid(v) ) then
+                continue
+            end
+
+            v:SetKeyValue("rendercolor", self:color(ent).r .. " " .. self:color(ent).g .. " " .. self:color(ent).b)
+        end
     end
 })
 
@@ -211,10 +220,19 @@ glowEyes:Register("models/combine_soldier_prisonguard.mdl", {
     end,
     color = function(self, ent)
         if ( ent:GetSkin() == 1 ) then
-            return Color(200, 96, 70), Color(200, 70, 70), Color(255, 100, 0)
+            return Color(200, 50, 0), Color(255, 50, 0), Color(255, 50, 0)
         end
 
         return Color(255, 185, 0), Color(255, 185, 0), Color(255, 150, 0)
+    end,
+    serverThink = function(self, ent)
+        for k, v in ipairs(ent.glowEyesTable) do
+            if not ( IsValid(v) ) then
+                continue
+            end
+
+            v:SetKeyValue("rendercolor", self:color(ent).r .. " " .. self:color(ent).g .. " " .. self:color(ent).b)
+        end
     end
 })
 
