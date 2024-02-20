@@ -268,94 +268,88 @@ else
                 return
             end
 
+            if ( ent:IsRagdoll() and not GetConVar("gloweyes_ragdolls"):GetBool() ) then
+                return
+            end
+
             if ( ent:IsRagdoll() ) then
                 ent:SetShouldServerRagdoll(true)
                 ent:SetCollisionGroup(COLLISION_GROUP_WORLD)
             end
 
-            if ( glowData.serverThink and isfunction(glowData.serverThink) ) then
-                local uID = "glowEyes.serverThink." .. ent:GetClass() .. "." .. ent:EntIndex()
+            local uID = "glowEyes.serverThink." .. ent:GetClass() .. "." .. ent:EntIndex()
 
-                timer.Create(uID, 1, 0.1, function()
-                    if not ( IsValid(ent) ) then
-                        timer.Remove(uID)
-
-                        return
-                    end
-
-                    if not ( ent.glowEyesTable ) then
-                        return
-                    end
-
-                    glowData:serverThink(ent)
-                end)
-
-                ent:CallOnRemove("glowEyes.serverThink.remove", function(this)
+            timer.Create(uID, 1, 0.1, function()
+                if not ( IsValid(ent) ) then
                     timer.Remove(uID)
-                end)
-            end
 
-            if ( glowData.serverInit and isfunction(glowData.serverInit) ) then
-                if ( ent:IsRagdoll() and not GetConVar("gloweyes_ragdolls"):GetBool() ) then
                     return
                 end
 
+                if ( glowData.serverThink and isfunction(glowData.serverThink) ) then
+                    glowData:serverThink(ent)
+                end
+            end)
+
+            ent:CallOnRemove("glowEyes.serverThink.remove", function(this)
+                timer.Remove(uID)
+            end)
+
+            if ( glowData.serverInit and isfunction(glowData.serverInit) ) then
                 glowData:serverInit(ent)
+            end
+
+            local uID = "glowEyes.serverThink." .. ent:EntIndex()
+
+            timer.Create(uID, 1, 0.1, function()
+                if not ( IsValid(ent) ) then
+                    timer.Remove(uID)
+
+                    return
+                end
+
+                if ( ent.glowEyesTable ) then
+                    for k, v in ipairs(ent.glowEyesTable) do
+                        if not ( IsValid(v) ) then
+                            continue
+                        end
+
+                        if ( glowEyes:ShouldRenderEntity(ent) ) then
+                            continue
+                        end
+
+                        v:SetNoDraw(true)                        
+                    end
+                end
 
                 if ( glowData.serverThink and isfunction(glowData.serverThink) ) then
-                    local uID = "glowEyes.serverThink." .. ent:EntIndex()
-    
-                    timer.Create(uID, 1, 0.1, function()
-                        if not ( IsValid(ent) ) then
-                            timer.Remove(uID)
-    
-                            return
-                        end
-    
-                        if not ( ent.glowEyesTable ) then
-                            return
-                        end
-    
-                        for k, v in ipairs(ent.glowEyesTable) do
-                            if not ( IsValid(v) ) then
-                                continue
-                            end
-    
-                            if ( glowEyes:ShouldRenderEntity(ent) ) then
-                                continue
-                            end
-    
-                            v:SetNoDraw(true)                        
-                        end
-    
-                        glowData:serverThink(ent)
-                    end)
+                    glowData:serverThink(ent)
                 end
-                
-                timer.Simple(0.1, function()
-                    if ( ent.glowEyesTable ) then
-                        for k, v in ipairs(ent.glowEyesTable) do
-                            if not ( IsValid(v) ) then
-                                continue
-                            end
+            end)
+            
+            timer.Simple(0.1, function()
+                if ( ent.glowEyesTable ) then
+                    for k, v in ipairs(ent.glowEyesTable) do
+                        if not ( IsValid(v) ) then
+                            continue
+                        end
 
-                            if not ( glowEyes:ShouldRenderEntity(ent) ) then
+                        if not ( glowEyes:ShouldRenderEntity(ent) ) then
+                            v:SetNoDraw(true)
+                        end
+
+                        if not ( glowEyes:IsActivated() ) then
+                            v:SetNoDraw(true)
+                        end
+
+                        if ( v:IsRagdoll() ) then
+                            if not ( GetConVar("gloweyes_ragdolls"):GetBool() ) then
                                 v:SetNoDraw(true)
-                            end
-
-                            if not ( glowEyes:IsActivated() ) then
-                                v:SetNoDraw(true)
-                            end
-
-                            if ( v:IsRagdoll() ) then
-                                if not ( GetConVar("gloweyes_ragdolls"):GetBool() ) then
-                                    v:SetNoDraw(true)
-                                end
                             end
                         end
                     end
-                end)
-            end
+                end
+            end)
         end)
     end)
 
@@ -375,35 +369,33 @@ else
                 glowData:serverInit(ply)
             end
 
-            if ( glowData.serverThink and isfunction(glowData.serverThink) ) then
-                local uID = "glowEyes.serverThink." .. ply:SteamID64()
+            local uID = "glowEyes.serverThink." .. ply:SteamID64()
 
-                timer.Create(uID, 1, 0.1, function()
-                    if not ( IsValid(ply) ) then
-                        timer.Remove(uID)
+            timer.Create(uID, 1, 0.1, function()
+                if not ( IsValid(ply) ) then
+                    timer.Remove(uID)
 
-                        return
-                    end
+                    return
+                end
 
-                    if not ( ply.glowEyesTable ) then
-                        return
-                    end
-
+                if ( ply.glowEyesTable ) then
                     for k, v in ipairs(ply.glowEyesTable) do
                         if not ( IsValid(v) ) then
                             continue
                         end
-
+    
                         if ( glowEyes:ShouldRenderEntity(ply) ) then
                             continue
                         end
-
+    
                         v:SetNoDraw(true)                        
                     end
+                end
 
+                if ( glowData.serverThink and isfunction(glowData.serverThink) ) then
                     glowData:serverThink(ply)
-                end)
-            end
+                end
+            end)
         end)
     end)
 
@@ -417,6 +409,8 @@ else
                 v:Remove()
             end
         end
+
+        timer.Remove("glowEyes.serverThink." .. ply:SteamID64())
     end)
     
     hook.Add("PlayerDisconnected", "glowEyes.PlayerDisconnected", function(ply)
@@ -468,6 +462,24 @@ else
                 end
 
                 v:Remove()
+            end
+        end
+    end)
+
+    hook.Add("PlayerNoClip", "glowEyes.PlayerNoClip", function(ply, state)
+        if not ( IsValid(ply) ) then
+            return
+        end
+
+        if ( state ) then
+            if ( ply.glowEyesTable ) then
+                for k, v in ipairs(ply.glowEyesTable) do
+                    if not ( IsValid(v) ) then
+                        continue
+                    end
+
+                    v:SetNoDraw(false)
+                end
             end
         end
     end)
