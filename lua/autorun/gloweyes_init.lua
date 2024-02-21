@@ -471,14 +471,18 @@ else
             return
         end
 
-        if ( state ) then
-            if ( ply.glowEyesTable ) then
-                for k, v in ipairs(ply.glowEyesTable) do
-                    if not ( IsValid(v) ) then
-                        continue
-                    end
+        if ( ply.glowEyesTable ) then
+            for k, v in ipairs(ply.glowEyesTable) do
+                if not ( IsValid(v) ) then
+                    continue
+                end
 
-                    v:SetNoDraw(false)
+                if ( state ) then
+                    v:SetNoDraw(true)
+                else
+                    if ( glowEyes:ShouldRenderEntity(ply) ) then
+                        v:SetNoDraw(false)
+                    end
                 end
             end
         end
