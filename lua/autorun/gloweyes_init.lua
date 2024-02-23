@@ -353,80 +353,6 @@ else
         end)
     end)
 
-    hook.Add("PlayerSpawn", "glowEyes.PlayerSpawn", function(ply)
-        timer.Simple(0.1, function()
-            if not ( IsValid(ply) ) then
-                return
-            end
-
-            local glowData = glowEyes.Stored[ply:GetModel():lower()]
-
-            if not ( glowData ) then
-                return
-            end
-
-            if ( glowData.serverInit and isfunction(glowData.serverInit) ) then
-                glowData:serverInit(ply)
-            end
-
-            local uID = "glowEyes.serverThink." .. ply:SteamID64()
-
-            timer.Create(uID, 1, 0.1, function()
-                if not ( IsValid(ply) ) then
-                    timer.Remove(uID)
-
-                    return
-                end
-
-                if ( ply.glowEyesTable ) then
-                    for k, v in ipairs(ply.glowEyesTable) do
-                        if not ( IsValid(v) ) then
-                            continue
-                        end
-    
-                        if ( glowEyes:ShouldRenderEntity(ply) ) then
-                            continue
-                        end
-    
-                        v:SetNoDraw(true)                        
-                    end
-                end
-
-                if ( glowData.serverThink and isfunction(glowData.serverThink) ) then
-                    glowData:serverThink(ply)
-                end
-            end)
-        end)
-    end)
-
-    hook.Add("DoPlayerDeath", "glowEyes.DoPlayerDeath", function(ply)
-        if ( ply.glowEyesTable ) then
-            for k, v in ipairs(ply.glowEyesTable) do
-                if not ( IsValid(v) ) then
-                    continue
-                end
-
-                v:Remove()
-            end
-        end
-
-        timer.Remove("glowEyes.serverThink." .. ply:SteamID64())
-    end)
-    
-    hook.Add("PlayerDisconnected", "glowEyes.PlayerDisconnected", function(ply)
-        if ( ply.glowEyesTable ) then
-            for k, v in ipairs(ply.glowEyesTable) do
-                if not ( IsValid(v) ) then
-                    continue
-                end
-
-                v:Remove()
-            end
-        end
-
-        timer.Remove("glowEyes.serverThink." .. ply:SteamID64())
-    end)
-
     hook.Add("OnNPCKilled", "glowEyes.OnNPCKilled", function(ent, attacker, inflictor)
         if not ( IsValid(ent) ) then
             return
@@ -462,28 +388,6 @@ else
                 end
 
                 v:Remove()
-            end
-        end
-    end)
-
-    hook.Add("PlayerNoClip", "glowEyes.PlayerNoClip", function(ply, state)
-        if not ( IsValid(ply) ) then
-            return
-        end
-
-        if ( ply.glowEyesTable ) then
-            for k, v in ipairs(ply.glowEyesTable) do
-                if not ( IsValid(v) ) then
-                    continue
-                end
-
-                if ( state ) then
-                    v:SetNoDraw(true)
-                else
-                    if ( glowEyes:ShouldRenderEntity(ply) ) then
-                        v:SetNoDraw(false)
-                    end
-                end
             end
         end
     end)
