@@ -62,6 +62,12 @@ function glowEyes:ShouldRenderEntity(ent)
         return false
     end
 
+    if ( ent:IsPlayer() ) then
+        if not ( ent:GetViewEntity() == ent ) then
+            return true
+        end
+    end
+
     return true
 end
 
@@ -456,16 +462,12 @@ else
                     end
 
                     if not ( bShouldRenderEyes ) then
-                        if not ( b:GetNoDraw() ) then
-                            b:SetNoDraw(true)
-                        end
-
+                        b:SetNoDraw(true)
+        
                         continue
                     end
                     
-                    if ( b:GetNoDraw() ) then
-                        b:SetNoDraw(false)
-                    end
+                    b:SetNoDraw(false)
                 end
             end
         end
