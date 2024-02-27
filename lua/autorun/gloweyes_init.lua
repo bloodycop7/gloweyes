@@ -257,7 +257,7 @@ else
                 return
             end
 
-            if ( ent:IsPlayer() ) then
+            if ( ent:IsPlayer() or not ( ent:IsRagdoll() or ent:GetClass() == "prop_dynamic" or ent:GetClass() == "prop_physics" ) ) then
                 return
             end
 
@@ -268,37 +268,26 @@ else
                 return
             end
 
-            if ( ent:IsRagdoll() and not GetConVar("gloweyes_ragdolls"):GetBool() ) then
-                return
-            end
-
-            if ( ent:IsRagdoll() ) then
-                ent:SetShouldServerRagdoll(true)
-                ent:SetCollisionGroup(COLLISION_GROUP_WORLD)
-            end
-
             if ( glowData.serverInit and isfunction(glowData.serverInit) ) then
                 glowData:serverInit(ent)
             end
 
             timer.Simple(0.1, function()
+                if not ( IsValid(ent) ) then
+                    return
+                end
+
+                if not ( glowEyes:ShouldRenderEntity(ent) ) then
+                    return
+                end
+
                 if ( ent.glowEyesTable ) then
                     for k, v in ipairs(ent.glowEyesTable) do
                         if not ( IsValid(v) ) then
                             continue
                         end
 
-                        if not ( glowEyes:ShouldRenderEntity(ent) ) then
-                            v:SetNoDraw(true)
-                        end
-
-                        if not ( glowEyes:IsActivated() ) then
-                            v:SetNoDraw(true)
-                        end
-
-                        if ( v:IsRagdoll() and not GetConVar("gloweyes_ragdolls"):GetBool() ) then
-                            v:SetNoDraw(true)
-                        end
+                        v:SetNoDraw(true)
                     end
                 end
             end)
@@ -346,10 +335,28 @@ else
         if ( glowEyesData.serverInit and isfunction(glowEyesData.serverInit) ) then
             glowEyesData:serverInit(ply)
         end
+
+        timer.Simple(0.1, function()
+            if ( ply.glowEyesTable ) then
+                for k, v in ipairs(ply.glowEyesTable) do
+                    if not ( IsValid(v) ) then
+                        continue
+                    end
+
+                    if not ( glowEyes:ShouldRenderEntity(ply) ) then
+                        v:SetNoDraw(true)
+                    end
+                end
+            end
+        end)
     end)
 
     hook.Add("DoPlayerDeath", "glowEyes.DoPlayerDeath", function(ply, attacker, dmginfo)
         if not ( IsValid(ply) ) then
+            return
+        end
+
+        if not ( IsValid(ply:GetModel()) ) then
             return
         end
 

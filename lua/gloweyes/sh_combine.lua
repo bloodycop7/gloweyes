@@ -109,12 +109,14 @@ glowEyes:Register("models/combine_soldier.mdl", {
         return Color(0, 255, 255), Color(0, 255, 255), Color(0, 255, 255)
     end,
     serverThink = function(self, ent)
-        for k, v in ipairs(ent.glowEyesTable) do
-            if not ( IsValid(v) ) then
-                continue
-            end
+        if ( ent.glowEyesTable ) then
+            for k, v in ipairs(ent.glowEyesTable) do
+                if not ( IsValid(v) ) then
+                    continue
+                end
 
-            v:SetKeyValue("rendercolor", self:color(ent).r .. " " .. self:color(ent).g .. " " .. self:color(ent).b)
+                v:SetKeyValue("rendercolor", self:color(ent).r .. " " .. self:color(ent).g .. " " .. self:color(ent).b)
+            end
         end
     end
 })
@@ -226,12 +228,14 @@ glowEyes:Register("models/combine_soldier_prisonguard.mdl", {
         return Color(255, 185, 0), Color(255, 185, 0), Color(255, 150, 0)
     end,
     serverThink = function(self, ent)
-        for k, v in ipairs(ent.glowEyesTable) do
-            if not ( IsValid(v) ) then
-                continue
-            end
+        if ( ent.glowEyesTable ) then
+            for k, v in ipairs(ent.glowEyesTable) do
+                if not ( IsValid(v) ) then
+                    continue
+                end
 
-            v:SetKeyValue("rendercolor", self:color(ent).r .. " " .. self:color(ent).g .. " " .. self:color(ent).b)
+                v:SetKeyValue("rendercolor", self:color(ent).r .. " " .. self:color(ent).g .. " " .. self:color(ent).b)
+            end
         end
     end
 })
@@ -545,12 +549,14 @@ glowEyes:Register("models/player/combine_soldier.mdl", {
         return ent:GetPlayerColor():ToColor(), ent:GetPlayerColor():ToColor(), ent:GetPlayerColor():ToColor()
     end,
     serverThink = function(self, ent)
-        for k, v in ipairs(ent.glowEyesTable) do
-            if not ( IsValid(v) ) then
-                continue
-            end
+        if ( ent.glowEyesTable ) then
+            for k, v in ipairs(ent.glowEyesTable) do
+                if not ( IsValid(v) ) then
+                    continue
+                end
 
-            v:SetKeyValue("rendercolor", self:color(ent).r .. " " .. self:color(ent).g .. " " .. self:color(ent).b)
+                v:SetKeyValue("rendercolor", self:color(ent).r .. " " .. self:color(ent).g .. " " .. self:color(ent).b)
+            end
         end
     end
 })
