@@ -257,7 +257,7 @@ else
                 return
             end
 
-            if ( ent:IsPlayer() or not ( ent:IsRagdoll() or ent:GetClass() == "prop_dynamic" or ent:GetClass() == "prop_physics" ) ) then
+            if not ( not ent:IsPlayer() or ent:IsRagdoll() or ent:GetClass() == "prop_dynamic" or ent:GetClass() == "prop_physics" ) then
                 return
             end
 
