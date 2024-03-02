@@ -82,7 +82,7 @@ for k, v in ipairs(files) do
 end
 
 if ( CLIENT ) then
-    timer.Create("glowEyes.RemoveClientsideEyeGlow", 1, 0, function()
+    timer.Create("glowEyes.RemoveClientsideEyeGlow", 0, 0, function()
         if not ( IsValid(LocalPlayer()) ) then
             return
         end
