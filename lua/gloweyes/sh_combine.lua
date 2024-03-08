@@ -109,14 +109,16 @@ glowEyes:Register("models/combine_soldier.mdl", {
         return Color(0, 255, 255), Color(0, 255, 255), Color(0, 255, 255)
     end,
     serverThink = function(self, ent)
-        if ( ent.glowEyesTable ) then
-            for k, v in ipairs(ent.glowEyesTable) do
-                if not ( IsValid(v) ) then
-                    continue
-                end
+        if ( IsValid(ent.leftEyeGlow) ) then
+            ent.leftEyeGlow:SetKeyValue("rendercolor", select(1, self:color(ent)).r .. " " .. select(1, self:color(ent)).g .. " " .. select(1, self:color(ent)).b)
+        end
 
-                v:SetKeyValue("rendercolor", self:color(ent).r .. " " .. self:color(ent).g .. " " .. self:color(ent).b)
-            end
+        if ( IsValid(ent.rightEyeGlow) ) then
+            ent.rightEyeGlow:SetKeyValue("rendercolor", select(2, self:color(ent)).r .. " " .. select(2, self:color(ent)).g .. " " .. select(2, self:color(ent)).b)
+        end
+
+        if ( IsValid(ent.worldGlowSprite) ) then
+            ent.worldGlowSprite:SetKeyValue("rendercolor", select(3, self:color(ent)).r .. " " .. select(3, self:color(ent)).g .. " " .. select(3, self:color(ent)).b)
         end
     end
 })
@@ -228,14 +230,16 @@ glowEyes:Register("models/combine_soldier_prisonguard.mdl", {
         return Color(255, 185, 0), Color(255, 185, 0), Color(255, 150, 0)
     end,
     serverThink = function(self, ent)
-        if ( ent.glowEyesTable ) then
-            for k, v in ipairs(ent.glowEyesTable) do
-                if not ( IsValid(v) ) then
-                    continue
-                end
+        if ( IsValid(ent.leftEyeGlow) ) then
+            ent.leftEyeGlow:SetKeyValue("rendercolor", select(1, self:color(ent)).r .. " " .. select(1, self:color(ent)).g .. " " .. select(1, self:color(ent)).b)
+        end
 
-                v:SetKeyValue("rendercolor", self:color(ent).r .. " " .. self:color(ent).g .. " " .. self:color(ent).b)
-            end
+        if ( IsValid(ent.rightEyeGlow) ) then
+            ent.rightEyeGlow:SetKeyValue("rendercolor", select(2, self:color(ent)).r .. " " .. select(2, self:color(ent)).g .. " " .. select(2, self:color(ent)).b)
+        end
+
+        if ( IsValid(ent.worldGlowSprite) ) then
+            ent.worldGlowSprite:SetKeyValue("rendercolor", select(3, self:color(ent)).r .. " " .. select(3, self:color(ent)).g .. " " .. select(3, self:color(ent)).b)
         end
     end
 })
@@ -549,14 +553,16 @@ glowEyes:Register("models/player/combine_soldier.mdl", {
         return ent:GetPlayerColor():ToColor(), ent:GetPlayerColor():ToColor(), ent:GetPlayerColor():ToColor()
     end,
     serverThink = function(self, ent)
-        if ( ent.glowEyesTable ) then
-            for k, v in ipairs(ent.glowEyesTable) do
-                if not ( IsValid(v) ) then
-                    continue
-                end
+        if ( IsValid(ent.leftEyeGlow) ) then
+            ent.leftEyeGlow:SetKeyValue("rendercolor", select(1, self:color(ent)).r .. " " .. select(1, self:color(ent)).g .. " " .. select(1, self:color(ent)).b)
+        end
 
-                v:SetKeyValue("rendercolor", self:color(ent).r .. " " .. self:color(ent).g .. " " .. self:color(ent).b)
-            end
+        if ( IsValid(ent.rightEyeGlow) ) then
+            ent.rightEyeGlow:SetKeyValue("rendercolor", select(2, self:color(ent)).r .. " " .. select(2, self:color(ent)).g .. " " .. select(2, self:color(ent)).b)
+        end
+
+        if ( IsValid(ent.worldGlowSprite) ) then
+            ent.worldGlowSprite:SetKeyValue("rendercolor", select(3, self:color(ent)).r .. " " .. select(3, self:color(ent)).g .. " " .. select(3, self:color(ent)).b)
         end
     end
 })
@@ -644,5 +650,14 @@ glowEyes:Register("models/player/combine_super_soldier.mdl", {
     end,
     color = function(self, ent)
         return ent:GetPlayerColor():ToColor(), ent:GetPlayerColor():ToColor()
+    end,
+    serverThink = function(self, ent)
+        if ( IsValid(ent.leftEyeGlow) ) then
+            ent.leftEyeGlow:SetKeyValue("rendercolor", select(1, self:color(ent)).r .. " " .. select(1, self:color(ent)).g .. " " .. select(1, self:color(ent)).b)
+        end
+
+        if ( IsValid(ent.worldGlowSprite) ) then
+            ent.worldGlowSprite:SetKeyValue("rendercolor", select(2, self:color(ent)).r .. " " .. select(2, self:color(ent)).g .. " " .. select(2, self:color(ent)).b)
+        end
     end
 })
