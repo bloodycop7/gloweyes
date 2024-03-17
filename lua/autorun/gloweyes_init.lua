@@ -30,6 +30,10 @@ function glowEyes:ShouldRenderEntity(ent)
     if not ( IsValid(ent) ) then
         return false
     end
+
+    if not ( glowEyes:IsActivated() ) then
+        return false
+    end
     
     if not ( ent:IsPlayer() or ent:IsNPC() or ent:IsRagdoll() ) then
         return
@@ -54,11 +58,11 @@ function glowEyes:ShouldRenderEntity(ent)
         return false
     end
 
-    if not ( glowEyes:IsActivated() ) then
+    if ( ent:IsRagdoll() and not GetConVar("gloweyes_ragdolls"):GetBool() ) then
         return false
     end
 
-    if ( ent:IsRagdoll() and not GetConVar("gloweyes_ragdolls"):GetBool() ) then
+    if ( ent:IsPlayer() and not GetConVar("gloweyes_players"):GetBool() ) then
         return false
     end
 
@@ -104,6 +108,7 @@ if ( CLIENT ) then
 
     CreateClientConVar("gloweyes_enabled", "1", true, false, "Enable or disable glow eyes.", 0, 1)
     CreateClientConVar("gloweyes_ragdolls", "1", true, false, "Enable or disable glow eyes on ragdolls.", 0, 1)
+    CreateClientConVar("gloweyes_players", "1", true, false, "Enable or disable glow eyes on players.", 0, 1)
 
     cvars.RemoveChangeCallback("gloweyes_enabled", "glowEyes.enabledChanged")
     cvars.AddChangeCallback("gloweyes_enabled", function(convar, sOldValue, sNewValue)
@@ -214,6 +219,57 @@ if ( CLIENT ) then
             end
         end
     end, "glowEyes.ragdollsChanged")
+
+    cvars.AddChangeCallback("gloweyes_players", function(convar, sOldValue, sNewValue)
+        local bConverted = tobool(sNewValue) or false
+        if not ( isbool(bConverted) ) then
+            return
+        end
+
+        if not ( glowEyes:IsActivated() ) then
+            print("[GlowEyes] Glow Eyes is not enabled, so this change will not take effect.")
+
+            return
+        end
+
+        for k, v in ipairs(player.GetAll()) do
+            if not ( IsValid(v) ) then
+                continue
+            end
+
+            if not ( v:GetModel() ) then
+                continue
+            end
+
+            local glowData = glowEyes.Stored[string.lower(v:GetModel())]
+
+            if not ( glowData ) then
+                continue
+            end
+
+            local eyeData = v.glowEyesTable
+
+            if not ( eyeData ) then
+                continue
+            end
+
+            for a, b in ipairs(eyeData) do
+                if not ( IsValid(b) ) then
+                    continue
+                end
+
+                if not ( glowEyes:ShouldRenderEntity(v) ) then
+                    b:SetNoDraw(false)
+                end
+
+                if ( bConverted ) then
+                    b:SetNoDraw(false)
+                else
+                    b:SetNoDraw(true)
+                end
+            end
+        end
+    end, "glowEyes.playersChanged")
 
     net.Receive("glowEyes.NetworkLightsToClientside", function(len)
         if not ( IsValid(LocalPlayer()) ) then
