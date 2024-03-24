@@ -559,6 +559,43 @@ else
         end
     end)
 
+    hook.Add("DoPlayerDeath", "glowEyes.DoPlayerDeath", function(ply, attacker, dmginfo)
+        if not ( IsValid(ply) ) then
+            return
+        end
+
+        if not ( ply:GetModel() ) then
+            return
+        end
+
+        local model = string.lower(ply:GetModel())
+        local glowData = glowEyes.Stored[model]
+
+        if not ( glowData ) then
+            return
+        end
+
+        if ( ply.glowEyesTable ) then
+            for k, v in ipairs(ply.glowEyesTable) do
+                if not ( IsValid(v) ) then
+                    continue
+                end
+
+                v:Remove()
+            end
+        end
+
+        timer.Simple(0.1, function()
+            local rag = ply:GetRagdollEntity()
+
+            if not ( IsValid(rag) ) then
+                return
+            end
+
+            hook.Run("OnEntityCreated", rag)
+        end)
+    end)
+
     hook.Add("PlayerDisconnected", "glowEyes.PlayerDisconnected", function(ply)
         if not ( IsValid(ply) ) then
             return
