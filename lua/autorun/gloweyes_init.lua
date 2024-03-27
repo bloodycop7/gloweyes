@@ -23,7 +23,11 @@ function glowEyes:Register(model, glowData)
 end
 
 function glowEyes:IsActivated()
-    return GetConVar("gloweyes_enabled"):GetBool() or false
+    if ( CLIENT ) then
+        return GetConVar("gloweyes_enabled"):GetBool() or false
+    end
+
+    return hook.Run("ShouldRenderGlowingEyes") or true
 end
 
 function glowEyes:ShouldRenderEntity(ent)
